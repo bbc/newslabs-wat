@@ -5,6 +5,8 @@ var juicer = {
 };
 
 var defaultJuicerSources = [1, 3, 8, 10, 11, 12, 14, 22, 23, 24, 40, 41, 42, 43, 44, 45, 70, 71, 72, 85, 89, 160, 166];
+var maxGraphYAxis = 10;
+var graphs = [];
 
 $(function() {
 
@@ -55,6 +57,8 @@ $(function() {
     
     event.preventDefault();
 
+    $('button[type="submit"]', form).attr('disabled', 'disabled');
+    
     $('#sources').hide();
     $('#sources-toggle').removeClass('active');
     $('#examples').hide();
@@ -66,6 +70,9 @@ $(function() {
     $("#progress .progress-bar").css({ width: "0%"});
     $("#progress").show();
 
+    maxGraphYAxis = 10;
+    graphs = [];
+    
     // @todo Get optional start and end dates to bound query
     var startDate = "",
         endDate = "";
@@ -100,7 +107,7 @@ $(function() {
         cache: false, // Append timestamp
         success: function(response) {
           results.push(response);
-          addResult(source, response);
+          addResult({ source: source, start: startDate, end: endDate }, response);
         },
         error: function() {
           // @todo Handle errors
@@ -113,9 +120,17 @@ $(function() {
           $("#progress .progress-bar span").html(percentComplete+"% Complete");
           $("#progress .progress-bar").attr("aria-valuenow", percentComplete);
           $("#progress .progress-bar").css({ width: percentComplete+"%"});
-          
+
+          $(graphs).each(function(index, graph) {
+            var axes = graph.getAxes();
+            axes.yaxis.options.max = maxGraphYAxis;
+            graph.setupGrid();
+            graph.draw();
+          });
+
           if (responseCounter === sources.length) {
             $("#progress").slideUp();
+            $('button[type="submit"]', form).removeAttr('disabled');
           }
         }
       });
@@ -158,12 +173,10 @@ function populateJuicerSources() {
   });
 };
 
-function addResult(source, result) {
+function addResult(query, result) {
+
   if (result.total < 1)
     return;
-  
-  console.log(result);
-
   
   // Get all tags and put them in a single object so they can be easily sorted  
   var tags = [];
@@ -184,26 +197,40 @@ function addResult(source, result) {
   var timeseries = [];
   $(result.timeseries).each(function(index, object) {
     timeseries.push([object.key, object.doc_count]);
+    if (object.doc_count > maxGraphYAxis)
+      maxGraphYAxis = object.doc_count;
   });
+  
+  // Pad timeseries array to a consistent start and end date (if dates specified)
+  if (query.start != "") {
+    var start = new Date(query.start).getTime();
+    if (timeseries[0] && timeseries[0][0] != start)
+      timeseries.unshift([start,0]);
+  }
+  if (query.end != "") {
+    var end = new Date(query.end).getTime();
+    if (timeseries[0] && timeseries[timeseries.length - 1][0] != end)
+      timeseries.push([end,0]);
+  }
 
-  var html ='<div class="col-md-4 sort" data-sort="'+result.total+'">'
+  var html ='<div class="result col-sm-6 col-md-4 col-lg-3 sort" data-sort="'+result.total+'">'
           +'  <div class="panel panel-default">'
           +'    <div class="panel-heading clearfix">'
           +'      <h4 class="pull-left" style="margin: 5px 0;">'
           +'        <i class="fa fa-fw fa-newspaper-o"></i>'
-          +'        '+source.name
+          +'        '+query.source.name
           +'      </h4>'
           +'      <p style="position: absolute; top: 10px; right: 25px; margin: 0;" class="lead"><span class="badge" style="font-size: 16px;">'+result.total+' articles</span></p>'
           +'    </div>'
-          +'    <div class="panel-body">'
-          +'      <div id="graph-'+source.id+'" class="graph text-center" style="height: 200px;"></div>'
+          +'    <div class="panel-body"  style="overflow: hidden;">'
+          +'      <div id="graph-'+query.source.id+'" class="graph text-center" style="height: 200px;"></div>'
           +'    </div>'
           +'    <div class="panel-footer" style="overflow: hidden;">'
           +'      <p class="lead" style="margin-bottom: 0;">';
         
     // Show the top 5 tags that co-occur with the search term
     $(tags).each(function(index, tag) {
-      if (index > 5)
+      if (index > 4)
         return;
       
       html += '        <span class="label label-info"><i class="fa fa-fw fa-tag"></i> '+tag.name+' <span class="badge" style="background-color: rgba(0,0,0,0.25);">'+tag.count+'</span></span><br/>';
@@ -217,18 +244,26 @@ function addResult(source, result) {
   $("#results").append(html);
 
   // Draw graph
-  $.plot("#graph-"+source.id, [timeseries], {
+  var graph = $.plot("#graph-"+query.source.id, [timeseries], {
     shadowSize: 0,
-    colors: ["red"],
+    colors: ["#CA0914"],
     grid: { borderWidth: 0 },
     xaxis: { mode: "time",
              tickLength: 0,
+             timeformat: "%d<br>%b",
+             minTickSize: [5, 'day'], 
      },
      yaxis: { tickLength: 0,
               tickDecimals: 0,
-              minTickSize: 10
+              minTickSize: 1
+     },
+     bars: {
+       show: true,
+       lineWidth: 3
      }
   });
+  
+  graphs.push(graph);
   
   // Sort view on insert
   var wrapper = $('#results');

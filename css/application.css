@@ -1,0 +1,6 @@
+@media (min-width: 768px) {
+  #results .result {
+    max-width: 400px;
+    height: 480px;
+  }
+}
