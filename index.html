@@ -48,9 +48,9 @@
           </div>
         </div>
         <form name="search" action="/" method="post" style="display: none;">
-          <div class="col-md-1">
-            <label class="hidden-xs hidden-sm" style="visibility: hidden;">Configure</label>
-            <button id="sources-toggle" type="button" name="search" class="btn btn-lg btn-default"><i class="fa fa-fw fa-cog"></i><span class="hidden-md hidden-lg">Configure </span><i class="fa fa-caret-down"></i></button>
+          <div class="col-md-1 hidden-xs hidden-sm">
+            <label>Sources</label>
+            <button type="button" name="search" class="sources-toggle btn btn-lg btn-default"><i class="fa fa-fw fa-cog"></i><span class="hidden-md hidden-lg">Configure </span><i class="fa fa-caret-down"></i></button>
           </div>
           <div class="col-md-3 col-lg-2">
             <label>Start</label>
@@ -80,6 +80,10 @@
             </div>
             <small class="text-muted">You can use AND, OR, NOT and parenthesis in queries.</small>
           </div>
+          <div class="col-md-1 visible-xs visible-sm">
+            <br/>
+            <a class="sources-toggle btn btn-default btn-block btn-sm" href="#"><i class="fa fa-lg fa-fw fa-cogs"></i> Customise sources</a>
+          </div>
         </form>
       </div>
       <div id="sources" class="row" style="display: none; margin-top: 10px;">
@@ -88,7 +92,10 @@
             <div class="panel-heading clearfix">
               <p class="lead pull-left" style="margin-bottom: 0;">Customise the sources you wish to compare</p>
               <div id="sources-hide" class="btn btn-sm btn-default pull-right"><i class="fa fa-lg text-muted fa-remove"></i></div>
-              <div id="sources-select-all" class="btn btn-sm btn-default pull-right" style="margin-right: 10px;">Select All</div>
+              <div class="btn-group pull-right" style="margin-right: 10px;">
+                <div id="sources-select-defaults" class="btn btn-sm btn-default">Default Sources</div>
+                <div id="sources-select-all" class="btn btn-sm btn-default">Select All</div>
+              </div>
             </div>
             <div class="panel-body">
               <div id="juicer-sources"></div>

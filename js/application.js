@@ -13,14 +13,14 @@ $(function() {
   // Get latest sources available from the juicer
   populateJuicerSources();
   
-  $(document).on("touch click", '#sources-toggle', function(event) {
+  $(document).on("touch click", '.sources-toggle', function(event) {
     $('#sources').toggle();
-    $('#sources-toggle').toggleClass('active');
+    $('.sources-toggle').toggleClass('active');
   });
   
   $(document).on("touch click", '#sources-hide', function(event) {
     $('#sources').hide();
-    $('#sources-toggle').removeClass('active');
+    $('.sources-toggle').removeClass('active');
   });
   
   $(document).on("touch click", '#examples a', function(event) {
@@ -49,6 +49,13 @@ $(function() {
   $(document).on('touch click', '#sources-select-all', function() {
     $('input[type="checkbox"].source').prop('checked', 'checked');
   });
+
+  $(document).on('touch click', '#sources-select-defaults', function() {
+    $('input[type="checkbox"].source').prop('checked', '');
+    $(defaultJuicerSources).each(function(index, value) {
+    $('input[value="'+value+'"].source').prop('checked', 'checked');
+    });
+  });
   
   
   $(document).on("submit", 'form[name="search"]', function(event) {
@@ -60,7 +67,7 @@ $(function() {
     $('button[type="submit"]', form).attr('disabled', 'disabled');
     
     $('#sources').hide();
-    $('#sources-toggle').removeClass('active');
+    $('.sources-toggle').removeClass('active');
     $('#examples').hide();
     $("#results").html('');
     
