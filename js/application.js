@@ -106,7 +106,7 @@ $(function() {
     */
     
     $(sources).each(function(index, source) {
-      var url = juicer.host+"/articles?sources[]="+source.id+"&q="+encodeURIComponent($('input[name="keywords"]', form).val())+"&published_before="+endDate+"&published_after="+startDate+"&apikey="+juicer.apikey;
+      var url = juicer.host+"/articles?size=0&sources[]="+source.id+"&q="+encodeURIComponent($('input[name="keywords"]', form).val())+"&published_before="+endDate+"&published_after="+startDate+"&apikey="+juicer.apikey;
       $.ajax({
         url: url,
         type: "GET",
