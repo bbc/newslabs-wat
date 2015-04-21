@@ -277,27 +277,13 @@ function addResult(query, result) {
           +'      </h4>'
           +'      <p style="position: absolute; top: 10px; right: 25px; margin: 0;" class="lead"><span class="badge" style="font-size: 16px;">'+result.total+' articles</span></p>'
           +'    </div>'
-          +'    <div class="panel-body" style="overflow: hidden;">';
-  
-
-    html +='      <div id="graph-'+query.source.id+'" class="graph text-center" style="height: 150px;"></div>';
-
-  // // Add images
-  // html +='      <div style="height: 50px; margin-top: 10px; overflow: hidden;">';
-  // $(images).each(function(index, url) {
-  //   html +='        <div class="image-tn pull-left" style="background-image: url('+url+');"></div>';
-  // });
-  // html +='      </div>';
-
-  html +='    </div>'
-       +'    <div class="panel-footer" style="position: relative; overflow: hidden; padding: 5px;">';
-    
-  
-    // if (images[0])
-    //   html +='        <div style="background-image: url('+images[0]+');" class="background-image"></div>';
-  
-
-        html +='      <p class="lead" style="margin-bottom: 0;">';
+          +'    <div class="panel-body" style="overflow: hidden; padding: 5px;">'
+          +'      <h6 class="text-muted text-center">ARTICLES</h6>'
+          +'      <div id="graph-'+query.source.id+'" class="graph text-center" style="height: 200px;"></div>'
+          +'    </div>'
+          +'    <div class="panel-footer" style="position: relative; overflow: hidden; padding: 5px;">'
+          +'      <h6 class="text-muted text-center">CO-OCCURING TOPICS</h6>'
+          +'      <p class="lead" style="margin: 0; padding: 0;">';
 
     // Show the top 5 tags that co-occur with the search term
     $(tags).each(function(index, tag) {
@@ -330,7 +316,7 @@ function addResult(query, result) {
      },
      bars: {
        show: true,
-       lineWidth: 3
+       lineWidth: 4
      }
   });
   
