@@ -231,6 +231,13 @@ function addResult(query, result) {
   var tags = [];
   $(result.aggregations.items).each(function(index, tagGroup) {
       $(tagGroup.items).each(function(index, tag) {
+
+        // Skipping tags that are not a Person, Place or Organisation 
+        if (tagGroup.id != 'http://dbpedia.org/ontology/Person' &&
+            tagGroup.id != 'http://dbpedia.org/ontology/Place' &&
+            tagGroup.id != 'http://dbpedia.org/ontology/Organisation')
+            return;
+        
         tags.push({
           id: tag.id,
           name: decodeURIComponent(tag.id.replace(/^(.*)\//, '').replace(/_/g, ' ')),
@@ -275,7 +282,7 @@ function addResult(query, result) {
           +'        <i class="fa fa-fw fa-newspaper-o"></i>'
           +'        '+query.source.name
           +'      </h4>'
-          +'      <p style="position: absolute; top: 10px; right: 25px; margin: 0;" class="lead"><span class="badge" style="font-size: 16px;">'+result.total+' articles</span></p>'
+          +'      <p style="position: absolute; top: 10px; right: 30px; margin: 0;" class="lead"><span class="badge" style="font-size: 16px;">'+result.total+' articles</span></p>'
           +'    </div>'
           +'    <div class="panel-body" style="overflow: hidden; padding: 5px;">'
           +'      <h6 class="text-muted text-center">ARTICLES</h6>'
@@ -290,7 +297,15 @@ function addResult(query, result) {
       if (index > 4)
         return;
       
-      html +='        <span class="label label-info"><i class="fa fa-fw fa-tag"></i> '+tag.name+' <span class="badge" style="background-color: rgba(0,0,0,0.25);">'+tag.count+'</span></span><br/>';
+      var tagIcon = 'fa-tag'
+      if (tag.type == 'http://dbpedia.org/ontology/Person')
+        tagIcon = 'fa-user';
+      if (tag.type == 'http://dbpedia.org/ontology/Place')
+        tagIcon = 'fa-globe';
+      if (tag.type == 'http://dbpedia.org/ontology/Organisation')
+        tagIcon = 'fa-sitemap';
+      
+      html +='        <span class="label label-info"><i class="fa fa-fw '+tagIcon+'"></i> '+tag.name+' <span class="badge" style="background-color: rgba(0,0,0,0.25);">'+tag.count+'</span></span><br/>';
     });
       
   html   +='      </p>'
