@@ -7,11 +7,12 @@ var juicer = {
 var defaultJuicerSources = [1, 3, 8, 10, 11, 12, 14, 22, 23, 24, 40, 41, 42, 43, 44, 45, 70, 71, 72, 85, 89, 160, 166];
 var maxGraphYAxis = 10;
 var graphs = [];
+var redrawResultsInterval = null;
 
 $(function() {
 
   // Get latest sources available from the juicer
-  populateJuicerSources();
+  init();
   
   $(document).on("touch click", '.sources-toggle', function(event) {
     $('#sources').toggle();
@@ -50,13 +51,16 @@ $(function() {
     $('input[type="checkbox"].source').prop('checked', 'checked');
   });
 
+  $(document).on('touch click', '#sources-select-none', function() {
+    $('input[type="checkbox"].source').prop('checked', '');
+  });
+
   $(document).on('touch click', '#sources-select-defaults', function() {
     $('input[type="checkbox"].source').prop('checked', '');
     $(defaultJuicerSources).each(function(index, value) {
-    $('input[value="'+value+'"].source').prop('checked', 'checked');
+      $('input[value="'+value+'"].source').prop('checked', 'checked');
     });
   });
-  
   
   $(document).on("submit", 'form[name="search"]', function(event) {
 
@@ -92,18 +96,19 @@ $(function() {
 
     // @todo Get selected sources
     var sources = [];
-    var results = [];
-    var responseCounter = 0;
+    var sourceIds = [];
+    var resultsCounter = 0;
   
     $('input[type="checkbox"].source:checked').each(function() {
         sources.push( { id: $(this).val(), name: $(this).data('name') } );
+        sourceIds.push( $(this).val() );
     });
-    
-    /*
+
     window.location.href = window.location.href.replace(/\#(.*)$/, '')
-                          + "#sources="+encodeURIComponent(sources.join(','))
-                          + "&keywords="+encodeURIComponent($('input[name="keywords"]', this).val());
-    */
+                          + "#!sources="+encodeURIComponent(sourceIds.join(','))
+                          + "&keywords="+encodeURIComponent($('input[name="keywords"]', this).val())
+                          + "&start="+encodeURIComponent(startDate)
+                          + "&end="+encodeURIComponent(endDate);
     
     $(sources).each(function(index, source) {
       var url = juicer.host+"/articles?size=0&sources[]="+source.id+"&q="+encodeURIComponent($('input[name="keywords"]', form).val())+"&published_before="+endDate+"&published_after="+startDate+"&apikey="+juicer.apikey;
@@ -113,29 +118,30 @@ $(function() {
         dataType: 'json',
         cache: false, // Append timestamp
         success: function(response) {
-          results.push(response);
           addResult({ source: source, start: startDate, end: endDate }, response);
         },
         error: function() {
           // @todo Handle errors
         },
         complete: function() {
-          responseCounter++;
+          
+          // Count all the results
+          resultsCounter++;
+          
+          // Redraw graphs (to update axis) second until all the results are in
+          // This is less intensive than doing for every result that comes in
+          if (redrawResultsInterval == null)
+            redrawResultsInterval = setInterval(function() { redrawResults() }, 1000);
           
           // For each result update progress, where sources.length == 100%
-          var percentComplete = (responseCounter / sources.length) * 100;
+          var percentComplete = parseInt((resultsCounter / sources.length) * 100);
           $("#progress .progress-bar span").html(percentComplete+"% Complete");
           $("#progress .progress-bar").attr("aria-valuenow", percentComplete);
           $("#progress .progress-bar").css({ width: percentComplete+"%"});
 
-          $(graphs).each(function(index, graph) {
-            var axes = graph.getAxes();
-            axes.yaxis.options.max = maxGraphYAxis;
-            graph.setupGrid();
-            graph.draw();
-          });
-
-          if (responseCounter === sources.length) {
+          if (resultsCounter === sources.length) {
+            clearInterval(redrawResultsInterval);
+            redrawResults();
             $("#progress").slideUp();
             $('button[type="submit"]', form).removeAttr('disabled');
           }
@@ -148,7 +154,7 @@ $(function() {
   
 });
 
-function populateJuicerSources() {
+function init() {
   $("#juicer-loading").slideDown();
   var juicerSources = $("#juicer-sources");
   juicerSources.html('<br/><p class="lead text-center">Updating sources...</p>')
@@ -169,11 +175,47 @@ function populateJuicerSources() {
                   +'  <label><input type="checkbox" '+checked+' class="source" name="source-'+source.id+'" data-name="'+source.name+'" value="'+source.id+'"/> <span class="text-muted">'+source.id+'.</span> '+source.name+'</label>'
                   +'</div>';
         juicerSources.append(html);
-        
-        $("#juicer-loading").hide();
-        $('form[name="search"]').slideDown();
-        $('#examples').show();
       });
+      
+      $("#juicer-loading").hide();
+      $('form[name="search"]').slideDown();
+      
+      // On page load, parse href for #! path
+      if (window.location.href.match(/\#!/)) {
+        var hashBangPath = window.location.href.replace(/^(.*)\#!/, '');
+        var keyValuePairs = hashBangPath.split("&");
+        var args = {};
+        $( keyValuePairs ).each(function(i, keyValuePair) {
+         var keyValue = keyValuePair.split("=");
+         args[keyValue[0]] = decodeURIComponent(keyValue[1]);
+        });
+  
+        if (args.keywords)
+          $(' form[name="search"] input[name="keywords"]').val(args.keywords);
+  
+        if (args.start && args.start != "")
+          $(' form[name="search"] input[name="start"]').val(args.start.replace(/T(.*)$/, ''));
+  
+        if (args.end && args.start != "")
+          $(' form[name="search"] input[name="end"]').val(args.end.replace(/T(.*)$/, ''));
+
+        if (args.sources && args.sources.length > 0) {
+          // Unselect all 
+          $('input[type="checkbox"].source').prop('checked', '');
+          // Select only sources in #! path
+          $(args.sources.split(",")).each(function(index, value) {
+            $('input[value="'+value+'"].source').prop('checked', 'checked');
+          });
+        }
+        
+        // Submit form with extracted values on page load
+        setTimeout(function() {
+          $('form[name="search"]').submit();
+        }, 500);
+      } else {
+        $('#examples').slideDown();
+      }
+      
     },
     error: function() {
     }
@@ -183,7 +225,7 @@ function populateJuicerSources() {
 function addResult(query, result) {
 
   if (result.total < 1)
-    return;
+   return;
   
   // Get all tags and put them in a single object so they can be easily sorted  
   var tags = [];
@@ -219,6 +261,12 @@ function addResult(query, result) {
     if (timeseries[0] && timeseries[timeseries.length - 1][0] != end)
       timeseries.push([end,0]);
   }
+  
+  var images = [];
+  $(result.hits).each(function(index, article) {
+    if (article.image != "")
+      images.push(article.image)
+  });
 
   var html ='<div class="result col-sm-6 col-md-4 col-lg-3 sort" data-sort="'+result.total+'">'
           +'  <div class="panel panel-default">'
@@ -229,18 +277,34 @@ function addResult(query, result) {
           +'      </h4>'
           +'      <p style="position: absolute; top: 10px; right: 25px; margin: 0;" class="lead"><span class="badge" style="font-size: 16px;">'+result.total+' articles</span></p>'
           +'    </div>'
-          +'    <div class="panel-body"  style="overflow: hidden;">'
-          +'      <div id="graph-'+query.source.id+'" class="graph text-center" style="height: 200px;"></div>'
-          +'    </div>'
-          +'    <div class="panel-footer" style="overflow: hidden;">'
-          +'      <p class="lead" style="margin-bottom: 0;">';
-        
+          +'    <div class="panel-body" style="overflow: hidden;">';
+  
+
+    html +='      <div id="graph-'+query.source.id+'" class="graph text-center" style="height: 150px;"></div>';
+
+  // // Add images
+  // html +='      <div style="height: 50px; margin-top: 10px; overflow: hidden;">';
+  // $(images).each(function(index, url) {
+  //   html +='        <div class="image-tn pull-left" style="background-image: url('+url+');"></div>';
+  // });
+  // html +='      </div>';
+
+  html +='    </div>'
+       +'    <div class="panel-footer" style="position: relative; overflow: hidden; padding: 5px;">';
+    
+  
+    // if (images[0])
+    //   html +='        <div style="background-image: url('+images[0]+');" class="background-image"></div>';
+  
+
+        html +='      <p class="lead" style="margin-bottom: 0;">';
+
     // Show the top 5 tags that co-occur with the search term
     $(tags).each(function(index, tag) {
       if (index > 4)
         return;
       
-      html += '        <span class="label label-info"><i class="fa fa-fw fa-tag"></i> '+tag.name+' <span class="badge" style="background-color: rgba(0,0,0,0.25);">'+tag.count+'</span></span><br/>';
+      html +='        <span class="label label-info"><i class="fa fa-fw fa-tag"></i> '+tag.name+' <span class="badge" style="background-color: rgba(0,0,0,0.25);">'+tag.count+'</span></span><br/>';
     });
       
   html   +='      </p>'
@@ -272,11 +336,22 @@ function addResult(query, result) {
   
   graphs.push(graph);
   
-  // Sort view on insert
+  // Sort graph view
   var wrapper = $('#results');
   wrapper.find('div.sort').sort(function (a, b) {
     return $(b).attr('data-sort') - $(a).attr('data-sort');
   })
   .appendTo( wrapper );
+
+}
+
+function redrawResults() {
+  // Upgrade all graph axis
+  $(graphs).each(function(index, graph) {
+    var axes = graph.getAxes();
+    axes.yaxis.options.max = maxGraphYAxis;
+    graph.setupGrid();
+    graph.draw();
+  });
 
 }

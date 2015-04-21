@@ -4,3 +4,22 @@
     height: 480px;
   }
 }
+
+.image-tn {
+  height: 50px;
+  width: 50px;
+  margin-right: 5px;
+  background: transparent no-repeat center center; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+/*  overflow: hidden;
+  z-index: 100;
+  opacity: 1;
+*/
+}
+
+.datepicker * {
+  border-radius: 0 !important;
+}
