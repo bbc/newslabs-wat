@@ -31,7 +31,7 @@ $(function() {
   });
 
   $(document).on("keyup", 'form[name="search"] input[name="keywords"]', function(event) {
-    if ($(this).val() == "")
+    if ($(this).val().trim() == "")
      $('#examples').show();
   });
   
@@ -111,7 +111,13 @@ $(function() {
                           + "&end="+encodeURIComponent(endDate);
     
     $(sources).each(function(index, source) {
-      var url = juicer.host+"/articles?size=0&sources[]="+source.id+"&q="+encodeURIComponent($('input[name="keywords"]', form).val())+"&published_before="+endDate+"&published_after="+startDate+"&apikey="+juicer.apikey;
+      var url = juicer.host+"/articles?size=0&sources[]="+source.id+"&published_before="+endDate+"&published_after="+startDate+"&apikey="+juicer.apikey;
+      
+      // Allow querying for all articles in juicer (without any keywords)
+      // NB: If q= is supplied with a blank argument no results are returned
+      if ($('input[name="keywords"]', form).val().trim() != "")
+        url += "&q="+encodeURIComponent($('input[name="keywords"]', form).val())
+      
       $.ajax({
         url: url,
         type: "GET",
@@ -282,10 +288,10 @@ function addResult(query, result) {
           +'        <i class="fa fa-fw fa-newspaper-o"></i>'
           +'        '+query.source.name
           +'      </h4>'
-          +'      <p style="position: absolute; top: 10px; right: 30px; margin: 0;" class="lead"><span class="badge" style="font-size: 16px;">'+result.total+' articles</span></p>'
+          +'      <p style="position: absolute; top: 10px; right: 30px; margin: 0;" class="lead"><span class="badge" style="font-size: 16px;">'+result.total+' <i class="fa fa-file-text-o"></i></span></p>'
           +'    </div>'
           +'    <div class="panel-body" style="overflow: hidden; padding: 5px;">'
-          +'      <h6 class="text-muted text-center">ARTICLES</h6>'
+          +'      <h6 class="text-muted text-center">'+result.total+' ARTICLES</h6>'
           +'      <div id="graph-'+query.source.id+'" class="graph text-center" style="height: 200px;"></div>'
           +'    </div>'
           +'    <div class="panel-footer" style="position: relative; overflow: hidden; padding: 5px;">'
