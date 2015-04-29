@@ -22,6 +22,11 @@ var redrawResultsInterval = null;
 $(function() {
   // Get latest sources available from the juicer on page load
   init();
+
+  $(document).on("touch click", '.about-toggle', function(event) {
+      event.preventDefault();
+      $('#about').slideToggle();
+  });
   
   $(document).on("touch click", '.sources-toggle', function(event) {
     $('#sources').toggle();
