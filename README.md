@@ -1,10 +1,12 @@
-# Media Coverage Checker
+# See who's talking about what
 
-A tool to compare coverage across different media sources using the BBC News Labs Juicer.
+A tool to compare coverage on different topics across different media sources using data from the BBC News Labs Juicer.
 
 http://coverage-checker.bbcnewslabs.co.uk
 
 Inspired by a concept by Iain Collins, Adam Ramsay &amp; Zoe Blackler at the Center for Investigative Reporting design sprint on Climate Change.
+
+Note: This experiment is still in development - the website is password protected outside of the BBC network.
 
 ## Installation instructions
 

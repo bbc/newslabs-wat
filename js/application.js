@@ -1,17 +1,26 @@
+/**
+ * See who's talking about what
+ *
+ * A tool to compare coverage on different topics across different media sources
+ * using data from the BBC News Labs Juicer.
+ * 
+ * @author  Iain Collins <iain.collins@bbc.co.uk>
+ */
 
 var juicer = {
     apikey: '9OHbOpZpVh9tQZBDjwTlTmsCF2Ce0yGQ',
     host: "http://data.test.bbc.co.uk/bbcrd-juicer"
 };
 
-var defaultJuicerSources = [1, 3, 8, 10, 11, 12, 14, 22, 23, 24, 40, 41, 42, 43, 44, 45, 70, 71, 72, 85, 89, 160, 166];
+// The default sources have been selected based on relevance and amount of 
+// articles we have indexed for them.
+var defaultJuicerSources = [1, 3, 8, 10, 11, 12, 14, 20, 21, 22, 23, 24, 40, 41, 42, 43, 44, 45, 51, 71, 72,73, 85, 88, 160, 166];
 var maxGraphYAxis = 10;
 var graphs = [];
 var redrawResultsInterval = null;
 
 $(function() {
-
-  // Get latest sources available from the juicer
+  // Get latest sources available from the juicer on page load
   init();
   
   $(document).on("touch click", '.sources-toggle', function(event) {
@@ -62,6 +71,7 @@ $(function() {
     });
   });
   
+  // Handle form submission
   $(document).on("submit", 'form[name="search"]', function(event) {
 
     var form = this;
@@ -74,11 +84,13 @@ $(function() {
     $('.sources-toggle').removeClass('active');
     $('#examples').hide();
     $("#results").html('');
+    $("#error").hide();
     
     // @todo Reset and show progress bar
     $("#progress .progress-bar span").html("0% Complete");
     $("#progress .progress-bar").attr("aria-valuenow", "0");
     $("#progress .progress-bar").css({ width: "0%"});
+    $("#progress-message").text("Fetching results...");
     $("#progress").show();
 
     maxGraphYAxis = 10;
@@ -122,12 +134,14 @@ $(function() {
         url: url,
         type: "GET",
         dataType: 'json',
+        timeout: 5 * 1000,
         cache: false, // Append timestamp
         success: function(response) {
           addResult({ source: source, start: startDate, end: endDate }, response);
         },
-        error: function() {
+        error: function(e) {
           // @todo Handle errors
+          $("#error").show();
         },
         complete: function() {
           
@@ -144,6 +158,7 @@ $(function() {
           $("#progress .progress-bar span").html(percentComplete+"% Complete");
           $("#progress .progress-bar").attr("aria-valuenow", percentComplete);
           $("#progress .progress-bar").css({ width: percentComplete+"%"});
+          $("#progress-message").text("Fetching results from "+resultsCounter+" of "+sources.length+" sources...");
 
           if (resultsCounter === sources.length) {
             clearInterval(redrawResultsInterval);
@@ -228,8 +243,10 @@ function init() {
   });
 };
 
-function addResult(query, result) {
-
+/**
+ * Add result box for a source to the page
+ */
+function addResult(query, result) {  
   if (result.total < 1)
    return;
   
@@ -295,7 +312,7 @@ function addResult(query, result) {
           +'      <div id="graph-'+query.source.id+'" class="graph text-center" style="height: 200px;"></div>'
           +'    </div>'
           +'    <div class="panel-footer" style="position: relative; overflow: hidden; padding: 5px;">'
-          +'      <h6 class="text-muted text-center">CO-OCCURING TOPICS</h6>'
+          +'      <h6 class="text-muted text-center"><i class="fa fa-lg fa-fw fa-tag"></i> CO-OCCURING TOPICS</h6>'
           +'      <p class="lead" style="margin: 0; padding: 0;">';
 
     // Show the top 5 tags that co-occur with the search term
@@ -352,6 +369,10 @@ function addResult(query, result) {
 
 }
 
+/**
+ * Function to normalize all graphs so they have the same max value on the Y 
+ * Axis. This is triggered whenever a new graph is added to the page.
+ */
 function redrawResults() {
   // Upgrade all graph axis
   $(graphs).each(function(index, graph) {
@@ -360,5 +381,4 @@ function redrawResults() {
     graph.setupGrid();
     graph.draw();
   });
-
 }

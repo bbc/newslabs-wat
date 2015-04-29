@@ -23,3 +23,15 @@
 .datepicker * {
   border-radius: 0 !important;
 }
+
+.page-heading .container {
+  position: relative;
+}
+
+.labs-logo {
+  position: absolute;
+  height: 170px;
+  top: -65px;
+  right: 0;
+  z-index: 1000;
+}

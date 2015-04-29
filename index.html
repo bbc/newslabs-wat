@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-    <title>BBC News Labs - Compare Media Coverage</title>
+    <title>BBC News Labs - Who's talking about what</title>
     <link rel="stylesheet" href="bower_components/bbcnewslabs-bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css"/>
@@ -30,17 +30,32 @@
           <a class="navbar-brand" href="http://bbcnewslabs.co.uk"><img src="img/bbc-logo.png" class="pull-left" style="height: 70%; margin-right: 10px;"/> News Labs</a>
         </div>
         <div class="collapse navbar-collapse header-collapse">
-          <p class="navbar-btn navbar-right"><a href="http://twitter.com/BBC_News_Labs" target="_blank" class="btn btn-primary navbar-link"><i class="fa fa-lg fa-twitter"></i> Follow News Labs</a></p>
+          <p class="navbar-btn"><a href="http://twitter.com/BBC_News_Labs" target="_blank" class="btn btn-primary navbar-link"><i class="fa fa-lg fa-twitter"></i> Follow on Twitter</a></p>
         </div>
       </div>
     </div>
     <div class="jumbotron page-heading">
       <div class="container">
-        <h1><strong>Compare Media Coverage</strong></h1>
-        <p class="text-muted">A tool for comparing coverage across the media</p>
+        <img class="labs-logo hidden-xs" src="img/news-labs-logo.png"/>
+        <h1><strong>Who's talking about what</strong></h1>
+        <p class="text-muted">See who's talking about what across hundreds of news sources</p>
       </div>
     </div>
     <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <p class="lead text-center text-muted">
+            This is an experimental R&amp;D project from News Labs. It may not accurately reflect coverage from all sources.
+          <p>
+          <!--
+          <p class="alert alert-info" style="margin-top: 5px;">
+            <i class="fa fa-lg fa-times close" data-dismiss="alert"></i>
+            <i class="fa fa-lg fa-fw fa-info-circle"></i>
+            This is an experimental Research &amp; Development project from News Labs and may not accurately reflect coverage from all sources.
+          </p>
+          -->
+        </div>
+      </div>
       <div class="row">
         <div id="juicer-loading" class="row" style="display: none;">
           <div class="col-md-10 col-md-offset-1">
@@ -90,7 +105,7 @@
         <div class="col-md-12">
           <div class="panel panel-default">
             <div class="panel-heading clearfix">
-              <p class="lead pull-left" style="margin-bottom: 0;">Customise the sources you wish to compare</p>
+              <p class="lead pull-left" style="margin-bottom: 0;">Customise the sources you wish to include</p>
               <div id="sources-hide" class="btn btn-sm btn-default pull-right"><i class="fa fa-lg text-muted fa-remove"></i></div>
               <div class="btn-group pull-right" style="margin-right: 10px;">
                 <div id="sources-select-defaults" class="btn btn-sm btn-default">Default sources</div>
@@ -109,17 +124,25 @@
           <h3>Example queries</h3>
           <h4><i class="fa fa-lg fa-angle-right"></i> <a href="#">election AND ("David Cameron" OR "Ed Miliband")</a></h4>
           <h4><i class="fa fa-lg fa-angle-right"></i> <a href="#">(immigration OR immigrants OR migrants) AND benefits</a></h4>
-          <h4><i class="fa fa-lg fa-angle-right"></i> <a href="#">Ukraine AND Russia NOT "MH17"</a></h4>
+          <h4><i class="fa fa-lg fa-angle-right"></i> <a href="#">(Syria OR Iraq) AND (ISIS OR ISIL OR "Islamic State")</a></h4>
           <h4><i class="fa fa-lg fa-angle-right"></i> <a href="#">"climate change"</a></h4>
         </div>
       </div>
       <div id="progress" class="row" style="display: none;">
         <br/>
         <div class="col-md-10 col-md-offset-1">
-          <p class="lead"><i class="fa fa-fw fa-refresh fa-spin"></i> Fetching results...</p>
+          <p class="lead"><i class="fa fa-fw fa-refresh fa-spin"></i> <span id="progress-message">Fetching results...</span></p>
           <div class="progress">
             <div class="progress-bar progress-bar-default" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%"><span class="sr-only">20% Complete</span></div>
           </div>
+        </div>
+      </div>
+      <div id="error" class="row" style="display: none;">
+        <div class="col-md-12">
+          <p class="alert alert-danger" style="margin-top: 15px;">
+            <i class="fa fa-lg fa-fw fa-warning"></i>
+              An error occured fetching results for one or more sources. You may want to try again. Reducing the number of sources might help.
+          </p>
         </div>
       </div>
     </div>
@@ -128,10 +151,10 @@
       <div class="row">
         <div class="col-md-12">
           <p class="lead text-center text-muted" style="margin-top: 20px; margin-bottom: 10px;">
-            Powered by the Juicer from BBC News Labs.
-          </p>
-          <p class="text-center text-muted">
-            Inspired by a concept by Iain Collins, Adam Ramsay &amp; Zoe Blackler at the Center for Investigative Reporting design sprint on Climate Change.
+            Inspired by a concept created by Iain Collins, Adam Ramsay &amp; Zoe Blackler
+            <br/>at the <a href="http://www.revealnews.org">Center for Investigative Reporting</a> design sprint on Climate Change
+            <br/><br/>
+            Using data from the BBC News Labs Juicer | <a href="https://github.com/BBC-News-Labs/coverage-checker"><i class="fa fa-lg fa-github"></i> View Source </a>
           </p>
         </div>
       </div>
