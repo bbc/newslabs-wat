@@ -261,10 +261,12 @@ function addResult(query, result) {
       $(tagGroup.items).each(function(index, tag) {
 
         // Skipping tags that are not a Person, Place or Organisation 
+        /*
         if (tagGroup.id != 'http://dbpedia.org/ontology/Person' &&
             tagGroup.id != 'http://dbpedia.org/ontology/Place' &&
             tagGroup.id != 'http://dbpedia.org/ontology/Organisation')
             return;
+        */
         
         tags.push({
           id: tag.id,
