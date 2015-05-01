@@ -139,7 +139,7 @@ $(function() {
         url: url,
         type: "GET",
         dataType: 'json',
-        timeout: 5 * 1000,
+        timeout: 10 * 1000,
         cache: false, // Append timestamp
         success: function(response) {
           addResult({ source: source, start: startDate, end: endDate }, response);
