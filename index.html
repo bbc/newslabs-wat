@@ -27,7 +27,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="http://bbcnewslabs.co.uk">News Labs</a>
+          <a class="navbar-brand" href="http://wat.bbcnewslabs.co.uk">WAT :: News Labs</a>
         </div>
         <div class="collapse navbar-collapse header-collapse">
           <p class="navbar-btn"><a href="http://twitter.com/BBC_News_Labs" target="_blank" class="btn btn-primary navbar-link"><i class="fa fa-lg fa-twitter"></i> Follow us on Twitter</a></p>
@@ -46,7 +46,7 @@
         <div class="col-md-12">
           <h4 class="text-center">
             <i class="fa fa-lg fa-fw fa-info-circle text-info"></i>
-            This is an experimental project from News Labs. Coverage may not be accurate for all sources. <a class="about-toggle" href=""><strong>What does this mean?</strong></a>
+            This is an experimental project from News Labs. <br class="visible-xs"/> <a class="about-toggle" href=""><strong>What does this mean?</strong></a>
           </h4>
           <br/>
         </div>
@@ -55,23 +55,37 @@
         <div class="col-md-12">
           <div class="well clearfix">
               <a class="about-toggle text-muted pull-right" href=""><i class="fa fa-2x fa-times-circle"></i></a>
+              <h2 style="margin-top: 0;">What am I looking at here?</h2>
+              <p class="lead">
+                This is an experimental tool that is currently in development. The analysis is not exhaustive. 
+                We currently include articles that appear in news feeds from around 350 sources. The default
+                sources are primarily UK news publishers.
+              </p>
               <div class="media">
-                <div class="media-left" style="width: 50%">
+                <div class="media-left hidden-xs" style="width: 50%">
                   <img src="img/example-graph.png" style="width: 100%;" alt="Example graph" class="pull-left" />
                 </div>
                 <div class="media-body">
-                  <h2>What am I looking at here?</h2>
+                  <img src="img/example-graph.png" style="width: 100%; margin: 20px 0;" alt="Example graph" class="visible-xs" />
                   <p class="lead">
-                    The Coverage Checker is an tool in development, the analysis is not exhaustive. 
-                    At the moment we collect articles that appear in RSS feeds of around 350 news sources, mainly UK,
-                    some international.<br>
-                    When you search for a keyword (combination) the graph shows you the number of matching articles
-                    per day, for each news source.<br>
-                    'Topics' are different. They are concepts we assign to the articles, even if the word itself may
-                    not appear. The topic <i>BBC</i> for example may appear as <i>BBC</i> or as <i>British Broadcaster</i> or maybe
-                    as <i>Radio4</i>.<br> 
-                    <b>This process is not perfect</b>, we are still building. Please, keep that in mind
-                    before interpreting the topic tags under the graphs. 
+                    When you enter a keyword or search term the graph shows you the number of corresponding articles
+                    found per day for each news source.
+                  </p>
+                  <p class="lead">
+                    The 'topics' which appear below each graph are tags we automatically assign to the articles.
+                  </p>
+                  <p class="lead">
+                    The tagging system attempts to handle
+                    disambiguation and normalisation; for example it knows that 
+                    <i>"BBC"</i> and <i>"British Broadcasting Corporation"</i> 
+                    refer to the same entity and it tries to use context to 
+                    based on the text in the article for disambiguation (e.g. to
+                    determine if a mention of <i>"BNP"</i> in an article referrs to the 
+                    <i>"British National Party"</i> or the bank <i>"BNP Parabas"</i>).
+                  </p>
+                  <p class="lead">
+                    This process is not perfect and is under constant improvement. 
+                    You should expect to come across some inaccuracies.
                   </p>
                 </div>
               </div>
@@ -173,7 +187,7 @@
       <div id="results" class="row"></div>
       <div class="row">
         <div class="col-md-12">
-          <p class="lead text-center text-muted" style="margin-top: 20px; margin-bottom: 10px;">
+          <p class="text-center text-muted" style="margin-top: 20px; margin-bottom: 10px;">
             Inspired by a concept created by Iain Collins, Adam Ramsay &amp; Zoe Blackler
             <br/>at the <a href="http://www.revealnews.org">Center for Investigative Reporting</a> design sprint on Climate Change
             <br/><br/>
