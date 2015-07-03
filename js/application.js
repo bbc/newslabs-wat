@@ -3,7 +3,7 @@
  *
  * A tool to compare coverage on different topics across different media sources
  * using data from the BBC News Labs Juicer.
- * 
+ *
  * @author  Iain Collins <iain.collins@bbc.co.uk>
  */
 
@@ -12,7 +12,7 @@ var juicer = {
     host: "http://data.test.bbc.co.uk/bbcrd-juicer"
 };
 
-// The default sources have been selected based on relevance and amount of 
+// The default sources have been selected based on relevance and amount of
 // articles we have indexed for them.
 var defaultJuicerSources = [1, 3, 8, 10, 11, 12, 14, 20, 21, 22, 23, 24, 40, 41, 42, 43, 44, 45, 51, 71, 72,73, 85, 88, 160, 166];
 var maxGraphYAxis = 10;
@@ -27,17 +27,17 @@ $(function() {
       event.preventDefault();
       $('#about').slideToggle();
   });
-  
+
   $(document).on("touch click", '.sources-toggle', function(event) {
     $('#sources').toggle();
     $('.sources-toggle').toggleClass('active');
   });
-  
+
   $(document).on("touch click", '#sources-hide', function(event) {
     $('#sources').hide();
     $('.sources-toggle').removeClass('active');
   });
-  
+
   $(document).on("touch click", '#examples a', function(event) {
     event.preventDefault();
     $('form[name="search"] input[name="keywords"]').val( $(this).text() );
@@ -48,7 +48,7 @@ $(function() {
     if ($(this).val().trim() == "")
      $('#examples').show();
   });
-  
+
   $('*[data-datepicker="true"] input[type="text"]').datepicker({
       todayBtn: true,
       orientation: "top left",
@@ -75,22 +75,22 @@ $(function() {
       $('input[value="'+value+'"].source').prop('checked', 'checked');
     });
   });
-  
+
   // Handle form submission
   $(document).on("submit", 'form[name="search"]', function(event) {
 
     var form = this;
-    
+
     event.preventDefault();
 
     $('button[type="submit"]', form).attr('disabled', 'disabled');
-    
+
     $('#sources').hide();
     $('.sources-toggle').removeClass('active');
     $('#examples').hide();
     $("#results").html('');
     $("#error").hide();
-    
+
     // @todo Reset and show progress bar
     $("#progress .progress-bar span").html("0% Complete");
     $("#progress .progress-bar").attr("aria-valuenow", "0");
@@ -100,14 +100,14 @@ $(function() {
 
     maxGraphYAxis = 10;
     graphs = [];
-    
+
     // @todo Get optional start and end dates to bound query
     var startDate = "",
         endDate = "";
 
     if ( $('input[name="start"]').val() != "" )
       startDate = $('input[name="start"]', this).val()+'T00:00:00.000Z';
-    
+
     if ( $('input[name="end"]').val() != "" )
       endDate = $('input[name="end"]', this).val()+'T00:00:00.000Z';
 
@@ -115,7 +115,7 @@ $(function() {
     var sources = [];
     var sourceIds = [];
     var resultsCounter = 0;
-  
+
     $('input[type="checkbox"].source:checked').each(function() {
         sources.push( { id: $(this).val(), name: $(this).data('name') } );
         sourceIds.push( $(this).val() );
@@ -126,15 +126,15 @@ $(function() {
                           + "&keywords="+encodeURIComponent($('input[name="keywords"]', this).val())
                           + "&start="+encodeURIComponent(startDate)
                           + "&end="+encodeURIComponent(endDate);
-    
+
     $(sources).each(function(index, source) {
-      var url = juicer.host+"/articles?size=0&sources[]="+source.id+"&published_before="+endDate+"&published_after="+startDate+"&apikey="+juicer.apikey;
-      
+      var url = juicer.host+"/articles?size=0&sources[]="+source.id+"&published_before="+endDate+"&published_after="+startDate+"&concepts=true&hist_interval=day"+"&apikey="+juicer.apikey;
+
       // Allow querying for all articles in juicer (without any keywords)
       // NB: If q= is supplied with a blank argument no results are returned
       if ($('input[name="keywords"]', form).val().trim() != "")
         url += "&q="+encodeURIComponent($('input[name="keywords"]', form).val())
-      
+
       $.ajax({
         url: url,
         type: "GET",
@@ -149,15 +149,15 @@ $(function() {
           $("#error").show();
         },
         complete: function() {
-          
+
           // Count all the results
           resultsCounter++;
-          
+
           // Redraw graphs (to update axis) second until all the results are in
           // This is less intensive than doing for every result that comes in
           if (redrawResultsInterval == null)
             redrawResultsInterval = setInterval(function() { redrawResults() }, 1000);
-          
+
           // For each result update progress, where sources.length == 100%
           var percentComplete = parseInt((resultsCounter / sources.length) * 100);
           $("#progress .progress-bar span").html(percentComplete+"% Complete");
@@ -177,7 +177,7 @@ $(function() {
 
     return false;
   });
-  
+
 });
 
 function init() {
@@ -196,16 +196,16 @@ function init() {
         var checked = '';
         if (defaultJuicerSources.indexOf(source.id) > -1)
           checked = 'checked="checked"';
-        
+
         var html = '<div class="col-md-3 checkbox" style="margin-top: 0;">'
                   +'  <label><input type="checkbox" '+checked+' class="source" name="source-'+source.id+'" data-name="'+source.name+'" value="'+source.id+'"/> <span class="text-muted">'+source.id+'.</span> '+source.name+'</label>'
                   +'</div>';
         juicerSources.append(html);
       });
-      
+
       $("#juicer-loading").hide();
       $('form[name="search"]').slideDown();
-      
+
       // On page load, parse href for #! path
       if (window.location.href.match(/\#!/)) {
         var hashBangPath = window.location.href.replace(/^(.*)\#!/, '');
@@ -215,25 +215,25 @@ function init() {
          var keyValue = keyValuePair.split("=");
          args[keyValue[0]] = decodeURIComponent(keyValue[1]);
         });
-  
+
         if (args.keywords)
           $(' form[name="search"] input[name="keywords"]').val(args.keywords);
-  
+
         if (args.start && args.start != "")
           $(' form[name="search"] input[name="start"]').val(args.start.replace(/T(.*)$/, ''));
-  
+
         if (args.end && args.start != "")
           $(' form[name="search"] input[name="end"]').val(args.end.replace(/T(.*)$/, ''));
 
         if (args.sources && args.sources.length > 0) {
-          // Unselect all 
+          // Unselect all
           $('input[type="checkbox"].source').prop('checked', '');
           // Select only sources in #! path
           $(args.sources.split(",")).each(function(index, value) {
             $('input[value="'+value+'"].source').prop('checked', 'checked');
           });
         }
-        
+
         // Submit form with extracted values on page load
         setTimeout(function() {
           $('form[name="search"]').submit();
@@ -241,7 +241,7 @@ function init() {
       } else {
         $('#examples').slideDown();
       }
-      
+
     },
     error: function() {
     }
@@ -251,23 +251,23 @@ function init() {
 /**
  * Add result box for a source to the page
  */
-function addResult(query, result) {  
+function addResult(query, result) {
   if (result.total < 1)
    return;
-  
-  // Get all tags and put them in a single object so they can be easily sorted  
+
+  // Get all tags and put them in a single object so they can be easily sorted
   var tags = [];
   $(result.aggregations.items).each(function(index, tagGroup) {
       $(tagGroup.items).each(function(index, tag) {
 
-        // Skipping tags that are not a Person, Place or Organisation 
+        // Skipping tags that are not a Person, Place or Organisation
         /*
         if (tagGroup.id != 'http://dbpedia.org/ontology/Person' &&
             tagGroup.id != 'http://dbpedia.org/ontology/Place' &&
             tagGroup.id != 'http://dbpedia.org/ontology/Organisation')
             return;
         */
-        
+
         tags.push({
           id: tag.id,
           name: decodeURIComponent(tag.id.replace(/^(.*)\//, '').replace(/_/g, ' ')),
@@ -286,7 +286,7 @@ function addResult(query, result) {
     if (object.doc_count > maxGraphYAxis)
       maxGraphYAxis = object.doc_count;
   });
-  
+
   // Pad timeseries array to a consistent start and end date (if dates specified)
   if (query.start != "") {
     var start = new Date(query.start).getTime();
@@ -298,7 +298,7 @@ function addResult(query, result) {
     if (timeseries[0] && timeseries[timeseries.length - 1][0] != end)
       timeseries.push([end,0]);
   }
-  
+
   var images = [];
   $(result.hits).each(function(index, article) {
     if (article.image != "")
@@ -326,7 +326,7 @@ function addResult(query, result) {
     $(tags).each(function(index, tag) {
       if (index > 4)
         return;
-      
+
       var tagIcon = 'fa-tag'
       if (tag.type == 'http://dbpedia.org/ontology/Person')
         tagIcon = 'fa-user';
@@ -334,15 +334,15 @@ function addResult(query, result) {
         tagIcon = 'fa-globe';
       if (tag.type == 'http://dbpedia.org/ontology/Organisation')
         tagIcon = 'fa-sitemap';
-      
+
       html +='        <span class="label label-info"><i class="fa fa-fw '+tagIcon+'"></i> '+tag.name+' <span class="badge" style="background-color: rgba(0,0,0,0.25);">'+tag.count+'</span></span><br/>';
     });
-      
+
   html   +='      </p>'
           +'    </div>'
           +'  </div>'
           +'</div>';
-      
+
   $("#results").append(html);
 
   // Draw graph
@@ -353,7 +353,7 @@ function addResult(query, result) {
     xaxis: { mode: "time",
              tickLength: 0,
              timeformat: "%d<br>%b",
-             minTickSize: [5, 'day'], 
+             minTickSize: [5, 'day'],
      },
      yaxis: { tickLength: 0,
               tickDecimals: 0,
@@ -364,9 +364,9 @@ function addResult(query, result) {
        lineWidth: 4
      }
   });
-  
+
   graphs.push(graph);
-  
+
   // Sort graph view
   var wrapper = $('#results');
   wrapper.find('div.sort').sort(function (a, b) {
@@ -377,7 +377,7 @@ function addResult(query, result) {
 }
 
 /**
- * Function to normalize all graphs so they have the same max value on the Y 
+ * Function to normalize all graphs so they have the same max value on the Y
  * Axis. This is triggered whenever a new graph is added to the page.
  */
 function redrawResults() {
