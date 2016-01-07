@@ -8,8 +8,8 @@
  */
 
 var juicer = {
-    apikey: '9OHbOpZpVh9tQZBDjwTlTmsCF2Ce0yGQ',
-    host: "http://data.test.bbc.co.uk/bbcrd-juicer"
+    api_key: '9OHbOpZpVh9tQZBDjwTlTmsCF2Ce0yGQ',
+    host: "http://juicer.api.bbci.co.uk"
 };
 
 // The default sources have been selected based on relevance and amount of
@@ -128,7 +128,7 @@ $(function() {
                           + "&end="+encodeURIComponent(endDate);
 
     $(sources).each(function(index, source) {
-      var url = juicer.host+"/articles?size=0&sources[]="+source.id+"&published_before="+endDate+"&published_after="+startDate+"&concepts=true&hist_interval=day"+"&apikey="+juicer.apikey;
+      var url = juicer.host+"/articles?size=0&sources[]="+source.id+"&published_before="+endDate+"&published_after="+startDate+"&concepts=true&hist_interval=day"+"&api_key="+juicer.api_key;
 
       // Allow querying for all articles in juicer (without any keywords)
       // NB: If q= is supplied with a blank argument no results are returned
@@ -185,7 +185,7 @@ function init() {
   var juicerSources = $("#juicer-sources");
   juicerSources.html('<br/><p class="lead text-center">Updating sources...</p>')
   $.ajax({
-    url: juicer.host+"/sources?apikey="+juicer.apikey,
+    url: juicer.host+"/sources?api_key="+juicer.api_key,
     type: "GET",
     dataType: 'json',
     cache: false, // Append timestamp
