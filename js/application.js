@@ -8,7 +8,7 @@
  */
 
 var juicer = {
-    api_key: '9OHbOpZpVh9tQZBDjwTlTmsCF2Ce0yGQ',
+    api_key: 'hDG57fZl4tbAIqn3BRJQVlc779GhND2a',
     host: "http://juicer.api.bbci.co.uk"
 };
 
